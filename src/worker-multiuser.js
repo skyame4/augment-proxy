@@ -52,10 +52,10 @@ export default {
       if (path === '/') {
         return handleDashboard(request, env);
       }
-      else if (path === '/admin') {
+      else if (path === '/admin' || path === '/admin/') {
         return handleAdminPanel(request, env);
       }
-      else if (path === '/admin/login') {
+      else if (path === '/admin/login' || path === '/admin/login/') {
         return handleAdminLoginPage(request, env);
       }
       
