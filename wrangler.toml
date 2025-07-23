@@ -1,5 +1,5 @@
 # Wrangler 配置文件 - 多用户Token池管理系统
-name = "augment2api-proxy-dual"
+name = "augment-proxy"
 main = "src/worker-multiuser.js"
 compatibility_date = "2024-01-01"
 
@@ -21,34 +21,34 @@ ADMIN_PASSWORD = "admin123"  # 生产环境中应使用强密码
 UNIFIED_TOKEN = "your-unified-token-here"
 ACCESS_PWD = "admin-password-123"
 
-# D1 数据库绑定 - 将由部署脚本自动配置
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "augment2api-multiuser"
-# database_id = ""
+# D1 数据库绑定
+[[d1_databases]]
+binding = "DB"
+database_name = "augment2api-multiuser"
+database_id = "placeholder-will-be-created-automatically"
 
 # 生产环境配置
 [env.production]
-name = "augment2api-proxy-prod"
+name = "augment-proxy-prod"
 
 [env.production.vars]
 UNIFIED_TOKEN = "your-production-unified-token"
 ACCESS_PWD = "your-production-admin-password"
 
-# [[env.production.d1_databases]]
-# binding = "DB"
-# database_name = "augment2api-multiuser"
-# database_id = ""
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "augment2api-multiuser"
+database_id = "placeholder-will-be-created-automatically"
 
 # 测试环境配置
 [env.staging]
-name = "augment2api-proxy-staging"
+name = "augment-proxy-staging"
 
 [env.staging.vars]
 UNIFIED_TOKEN = "your-staging-unified-token"
 ACCESS_PWD = "your-staging-admin-password"
 
-# [[env.staging.d1_databases]]
-# binding = "DB"
-# database_name = "augment2api-multiuser"
-# database_id = ""
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "augment2api-multiuser"
+database_id = "placeholder-will-be-created-automatically"
