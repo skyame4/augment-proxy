@@ -21,11 +21,11 @@ ADMIN_PASSWORD = "admin123"  # 生产环境中应使用强密码
 UNIFIED_TOKEN = "your-unified-token-here"
 ACCESS_PWD = "admin-password-123"
 
-# D1 数据库绑定 - 将由部署脚本自动配置
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "augment2api-multiuser"
-# database_id = ""
+# D1 数据库绑定
+[[d1_databases]]
+binding = "DB"
+database_name = "augment2api-multiuser"
+database_id = "placeholder-will-be-created-automatically"
 
 # 生产环境配置
 [env.production]
@@ -35,10 +35,10 @@ name = "augment2api-proxy-prod"
 UNIFIED_TOKEN = "your-production-unified-token"
 ACCESS_PWD = "your-production-admin-password"
 
-# [[env.production.d1_databases]]
-# binding = "DB"
-# database_name = "augment2api-multiuser"
-# database_id = ""
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "augment2api-multiuser"
+database_id = "placeholder-will-be-created-automatically"
 
 # 测试环境配置
 [env.staging]
@@ -48,7 +48,7 @@ name = "augment2api-proxy-staging"
 UNIFIED_TOKEN = "your-staging-unified-token"
 ACCESS_PWD = "your-staging-admin-password"
 
-# [[env.staging.d1_databases]]
-# binding = "DB"
-# database_name = "augment2api-multiuser"
-# database_id = ""
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "augment2api-multiuser"
+database_id = "placeholder-will-be-created-automatically"
