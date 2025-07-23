@@ -433,7 +433,7 @@ async function handleUserProfile(request, env) {
     // 获取用户的token分配信息
     const allocations = await env.DB.prepare(`
       SELECT t.name, t.token_prefix, ta.status, ta.created_at
-      FROM token_allocations ta
+      FROM user_token_allocations ta
       JOIN tokens t ON ta.token_id = t.id
       WHERE ta.user_id = ? AND ta.status = 'active'
     `).bind(user.id).all();
@@ -662,7 +662,7 @@ async function handleAdminCreateAllocation(request, env) {
 
     // 检查用户当前分配的Token数量
     const currentAllocations = await env.DB.prepare(`
-      SELECT COUNT(*) as count FROM token_allocations
+      SELECT COUNT(*) as count FROM user_token_allocations
       WHERE user_id = ? AND status = 'active'
     `).bind(user_id).first();
 
@@ -688,7 +688,7 @@ async function handleAdminCreateAllocation(request, env) {
 
         // 检查是否已经分配
         const existing = await env.DB.prepare(`
-          SELECT id FROM token_allocations
+          SELECT id FROM user_token_allocations
           WHERE user_id = ? AND token_id = ? AND status = 'active'
         `).bind(user_id, token_id).first();
 
@@ -698,7 +698,7 @@ async function handleAdminCreateAllocation(request, env) {
         }
 
         const result = await env.DB.prepare(`
-          INSERT INTO token_allocations (user_id, token_id, status)
+          INSERT INTO user_token_allocations (user_id, token_id, status)
           VALUES (?, ?, 'active')
         `).bind(user_id, token_id).run();
 
@@ -757,7 +757,7 @@ async function handleAdminStats(request, env) {
     }
 
     try {
-      const allocations = await env.DB.prepare('SELECT COUNT(*) as count FROM token_allocations WHERE status = "active"').first();
+      const allocations = await env.DB.prepare('SELECT COUNT(*) as count FROM user_token_allocations WHERE status = "active"').first();
       allocationsCount = allocations?.count || 0;
     } catch (error) {
       console.log('Token_allocations table not found or error:', error.message);

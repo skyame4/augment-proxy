@@ -4,7 +4,10 @@
 -- 保留原有的 tokens 表（存储所有可用的 Augment Token）
 CREATE TABLE IF NOT EXISTS tokens (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
     token TEXT NOT NULL UNIQUE,
+    token_hash TEXT,
+    token_prefix TEXT,
     tenant_url TEXT NOT NULL,
     status TEXT DEFAULT 'active' CHECK (status IN ('active', 'disabled', 'maintenance')),
     remark TEXT DEFAULT '',
