@@ -67,6 +67,10 @@ export default {
       else if (path === '/api/tokens' && method === 'GET') {
         return handlePluginTokens(request, env);
       }
+      // 插件专用凭证获取API
+      else if (path === '/api/plugin/credentials' && method === 'GET') {
+        return handlePluginCredentials(request, env);
+      }
       else if (path === '/api/tokens' && method === 'GET') {
         return handleGetUserTokens(request, env);
       }
@@ -295,7 +299,7 @@ async function handlePluginTokens(request, env) {
 
     // 转换为插件期望的格式
     const tokenList = availableTokens.map(token => ({
-      token: token.token || token.token_prefix + '...', // 如果有实际token则使用，否则使用前缀
+      token: token.token, // 返回完整Token供插件使用
       tenant_url: token.tenant_url || 'https://api.augmentcode.com', // 包含租户URL
       usage_count: token.usage_count || 0,
       last_used: token.last_used_at,
@@ -318,6 +322,70 @@ async function handlePluginTokens(request, env) {
   } catch (error) {
     console.error('Error in handlePluginTokens:', error);
     return jsonResponse({ error: 'Failed to get tokens' }, 500);
+  }
+}
+
+// 处理插件专用凭证获取API
+async function handlePluginCredentials(request, env) {
+  const authHeader = request.headers.get('Authorization');
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return jsonResponse({ error: 'Missing or invalid authorization header' }, 401);
+  }
+
+  const token = authHeader.substring(7);
+
+  try {
+    // 检查是否是UNIFIED_TOKEN
+    let user, isUnifiedToken = false;
+
+    if (token === env.UNIFIED_TOKEN) {
+      // UNIFIED_TOKEN用户
+      user = {
+        id: 'unified-user',
+        username: 'Unified User',
+        email: 'unified@augment2api.com'
+      };
+      isUnifiedToken = true;
+    } else {
+      // 普通用户
+      user = await getUserByPersonalToken(env.DB, token);
+      if (!user) {
+        return jsonResponse({ error: 'Invalid personal token' }, 401);
+      }
+    }
+
+    // 获取用户的最优Token
+    const optimalToken = await selectOptimalToken(env.DB, user.id, isUnifiedToken);
+    if (!optimalToken) {
+      return jsonResponse({ error: 'No available tokens for this user' }, 404);
+    }
+
+    // 记录用户活动
+    await logUserActivity(env.DB, user.id, 'plugin_get_credentials', {
+      ip: request.headers.get('CF-Connecting-IP'),
+      userAgent: request.headers.get('User-Agent'),
+      token_id: optimalToken.id
+    });
+
+    // 返回完整的凭证信息
+    return jsonResponse({
+      status: 'success',
+      credentials: {
+        tenant_url: optimalToken.tenant_url,
+        token: optimalToken.token,
+        usage_count: optimalToken.usage_count,
+        last_used: optimalToken.last_used_at
+      },
+      user: {
+        id: user.id,
+        username: user.username || 'Unified User'
+      }
+    });
+
+  } catch (error) {
+    console.error('Error in handlePluginCredentials:', error);
+    return jsonResponse({ error: 'Failed to get credentials' }, 500);
   }
 }
 

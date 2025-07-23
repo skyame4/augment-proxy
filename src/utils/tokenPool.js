@@ -21,13 +21,13 @@ export async function getAvailableTokensForUser(db, userId, isUnifiedToken = fal
     } else {
       // 普通用户只能访问分配给他们的token
       tokens = await db.prepare(`
-        SELECT t.*, ta.created_at as allocated_at
+        SELECT t.*, ta.allocated_at as allocated_at
         FROM tokens t
-        JOIN token_allocations ta ON t.id = ta.token_id
+        JOIN user_token_allocations ta ON t.id = ta.token_id
         WHERE ta.user_id = ?
           AND ta.status = 'active'
           AND t.status = 'active'
-        ORDER BY t.usage_count ASC, ta.created_at ASC
+        ORDER BY t.usage_count ASC, ta.allocated_at ASC
       `).bind(userId).all();
     }
 
@@ -201,7 +201,7 @@ export async function autoAllocateTokensToUser(db, userId, count = 1) {
       SELECT t.* FROM tokens t
       WHERE t.status = 'active'
         AND t.id NOT IN (
-          SELECT uta.token_id FROM user_token_allocations uta 
+          SELECT uta.token_id FROM user_token_allocations uta
           WHERE uta.user_id = ? AND uta.status = 'active'
         )
       ORDER BY t.usage_count ASC, t.created_at ASC
